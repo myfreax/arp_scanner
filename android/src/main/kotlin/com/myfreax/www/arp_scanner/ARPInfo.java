@@ -6,7 +6,6 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-
 /**
  * Looks at the file at /proc/net/arp to fromIPAddress ip/mac addresses from the cache
  * We assume that the file has this structure:
@@ -24,48 +23,6 @@ public class ARPInfo {
     private ARPInfo() {
     }
 
-
-    /**
-     * Try to extract a hardware MAC address from a given IP address
-     *
-     * @param ip - IP address to search for
-     * @return the MAC from the ARP cache or null in format "01:23:45:67:89:ab"
-     */
-    public static String getMACFromIPAddress(String ip) {
-        if (ip == null) {
-            return null;
-        }
-
-        HashMap<String, String> cache = getAllIPAndMACAddressesInARPCache();
-        return cache.get(ip);
-    }
-
-
-    /**
-     * Try to extract a IP address from the given MAC address
-     *
-     * @param macAddress in format "01:23:45:67:89:ab" to search for
-     * @return the IP address found or null in format "192.168.0.1"
-     */
-    public static String getIPAddressFromMAC(String macAddress) {
-        if (macAddress == null) {
-            return null;
-        }
-
-        if (!macAddress.matches("..:..:..:..:..:..")) {
-            throw new IllegalArgumentException("Invalid MAC Address");
-        }
-
-        HashMap<String, String> cache = getAllIPAndMACAddressesInARPCache();
-        for (String ip : cache.keySet()) {
-            if (cache.get(ip).equalsIgnoreCase(macAddress)) {
-                return ip;
-            }
-        }
-        return null;
-    }
-
-
     /**
      * Returns all the ip addresses currently in the ARP cache (/proc/net/arp).
      *
@@ -74,16 +31,6 @@ public class ARPInfo {
     public static ArrayList<String> getAllIPAddressesInARPCache() {
         return new ArrayList<>(getAllIPAndMACAddressesInARPCache().keySet());
     }
-
-    /**
-     * Returns all the MAC addresses currently in the ARP cache (/proc/net/arp).
-     *
-     * @return list of MAC addresses found
-     */
-    public static ArrayList<String> getAllMACAddressesInARPCache() {
-        return new ArrayList<>(getAllIPAndMACAddressesInARPCache().values());
-    }
-
 
     /**
      * Returns all the IP/MAC address pairs currently in the following places
@@ -95,55 +42,8 @@ public class ARPInfo {
      */
     public static HashMap<String, String> getAllIPAndMACAddressesInARPCache() {
         HashMap<String, String> macList = getAllIPandMACAddressesFromIPSleigh();
-//        for (String line : getLinesInARPCache()) {
-//            String[] splitted = line.split(" +");
-//            if (splitted.length >= 4) {
-//                // Ignore values with invalid MAC addresses
-//                if (splitted[3].matches("..:..:..:..:..:..")
-//                        && !splitted[3].equals("00:00:00:00:00:00")) {
-//                    if (!macList.containsKey(splitted[0])) {
-//                        macList.put(splitted[0], splitted[3]);
-//                    }
-//                }
-//            }
-//        }
         return macList;
     }
-
-    /**
-     * Method to read lines from the ARP Cache
-     *
-     * @return the lines of the ARP Cache.
-     */
-//    private static ArrayList<String> getLinesInARPCache() {
-//        ArrayList<String> lines = new ArrayList<>();
-//
-//        // If we cant read the file just return empty list
-//        if (!new File("/proc/net/arp").canRead()){
-//            return lines;
-//        }
-//
-//        BufferedReader br = null;
-//        try {
-//            br = new BufferedReader(new FileReader("/proc/net/arp"));
-//            String line;
-//            while ((line = br.readLine()) != null) {
-//                lines.add(line);
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        } finally {
-//            try {
-//                if (br != null) {
-//                    br.close();
-//                }
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//        return lines;
-//    }
-
 
     /**
      * Get the IP / MAC address pairs from `ip sleigh show` command
@@ -157,7 +57,6 @@ public class ARPInfo {
             Runtime runtime = Runtime.getRuntime();
             Process proc = runtime.exec("ip neigh show");
             proc.waitFor();
-            int exit = proc.exitValue();
 
             InputStreamReader reader = new InputStreamReader(proc.getInputStream());
             BufferedReader buffer = new BufferedReader(reader);

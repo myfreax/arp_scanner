@@ -2,37 +2,31 @@ package main
 
 import (
 	"database/sql"
+	"encoding/csv"
 	"fmt"
-	_ "github.com/mattn/go-sqlite3"
 	"log"
 	"net/http"
-	"encoding/csv"
 	"os"
-	"io"
+
+	_ "github.com/mattn/go-sqlite3"
 )
 
-func fetchCsv(db *sql.DB ) {
+func fetchCsv(db *sql.DB) {
+	fmt.Println("Loading.... Please wait a montent")
 	resp, _ := http.Get("http://standards-oui.ieee.org/oui/oui.csv")
 	defer resp.Body.Close()
 	r := csv.NewReader(resp.Body)
-	r.Read()
-	for {
-		record, err := r.Read()
-		if err == io.EOF {
-			break
-		}
-		mac := ""
-		for i, char := range record[1] {
-			if i > 0 && i % 2 == 0 {
-				mac += ":"
-			}
-			mac += string(char)
-		}
-		write(db, mac, record[2])
-		println(record[2])
-		fmt.Println(mac)
+
+	records, err := r.ReadAll()
+	if err != nil {
+		fmt.Println("read error")
+		return
 	}
 
+	for i := 1; i < len(records); i++ {
+		fmt.Println(records[i][1], records[i][2], i)
+		write(db, records[i][1], records[i][2])
+	}
 }
 
 func write(db *sql.DB, mac string, text string) {
@@ -53,7 +47,7 @@ func write(db *sql.DB, mac string, text string) {
 }
 
 func main() {
-	dbFile := "./app/src/main/assets/mac_devices.db"
+	dbFile := "./android/src/main/assets/mac_devices.db"
 	os.Remove(dbFile)
 
 	db, err := sql.Open("sqlite3", dbFile)

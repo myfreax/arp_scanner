@@ -6,6 +6,7 @@ public class Device {
     public String ip;
     public String hostname;
     public String mac;
+    public String vendor;
     public float time = 0;
 
     public Device(InetAddress ip) {

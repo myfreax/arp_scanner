@@ -23,6 +23,7 @@ rootProject.allprojects {
 
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion 29
@@ -47,7 +48,12 @@ android {
 }
 
 dependencies {
+    def room_version = "2.3.0"
+    implementation "androidx.room:room-runtime:$room_version"
+    annotationProcessor "androidx.room:room-compiler:$room_version"
+    kapt "androidx.room:room-compiler:$room_version"
     implementation 'com.google.code.gson:gson:2.8.9'
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.2"
+    //implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.2"
+    //default
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }

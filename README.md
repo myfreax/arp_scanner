@@ -35,3 +35,14 @@ Clone repo to local. Then
  go run createMacVendorDB.go
 ```
 Add local repo as your project dependency after Mac vendor database is updated.
+
+## Fix `Duplicate class com.google.gson`
+```
+android {
+  configurations {
+    all {
+      exclude module:'gson'
+    }
+  }
+}
+```

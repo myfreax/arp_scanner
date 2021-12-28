@@ -42,6 +42,13 @@ public class SubnetDevices {
     private SubnetDevices() {
     }
 
+    /**
+     * Cancel a running scan
+     */
+    public void cancel() {
+        this.cancelled = true;
+    }
+
     private String getVendor(String mac) {
         if (mac != null) {
             String[] macChars = mac.split(":");

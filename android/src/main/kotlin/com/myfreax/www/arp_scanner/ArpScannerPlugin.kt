@@ -27,6 +27,9 @@ class ArpScannerPlugin : FlutterPlugin, MethodCallHandler {
     private val gson by lazy {
         Gson()
     }
+    private val subnetDevices by lazy<SubnetDevices> {
+        SubnetDevices.fromLocalAddress()
+    }
     private lateinit var appContext: Context
     private lateinit var channel: MethodChannel
     private lateinit var scanningEventChannel: EventChannel
@@ -65,6 +68,7 @@ class ArpScannerPlugin : FlutterPlugin, MethodCallHandler {
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
         when (call.method) {
             "scan" -> findSubnetDevices(result)
+            "cancel" -> cancel(result)
             else -> result.notImplemented()
         }
     }
@@ -76,8 +80,7 @@ class ArpScannerPlugin : FlutterPlugin, MethodCallHandler {
 
     private fun findSubnetDevices(result: Result) {
         result.success(true)
-        SubnetDevices.fromLocalAddress()
-            .findDevices(this.appContext, object : SubnetDevices.OnSubnetDeviceFound {
+        subnetDevices.findDevices(this.appContext, object : SubnetDevices.OnSubnetDeviceFound {
                 override fun onDeviceFound(foundedDevice: Device) {
                     Log.d(
                         TAG,
@@ -97,5 +100,10 @@ class ArpScannerPlugin : FlutterPlugin, MethodCallHandler {
                     }
                 }
             })
+    }
+    private fun cancel(result: Result){
+        Log.d(TAG,"scan canceled")
+        subnetDevices.cancel()
+        result.success(true)
     }
 }

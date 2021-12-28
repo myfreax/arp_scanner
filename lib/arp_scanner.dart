@@ -12,13 +12,12 @@ class ArpScanner {
   static const EventChannel _scanFinishedEventChannel =
       EventChannel('arp_scanFinished');
 
-  static Future<String?> get platformVersion async {
-    final String? version = await _channel.invokeMethod('getPlatformVersion');
-    return version;
-  }
-
   static Future<bool> scan() async {
     return await _channel.invokeMethod('scan');
+  }
+
+  static Future<bool> cancel() async {
+    return await _channel.invokeMethod('cancel');
   }
 
   static Stream<Device> get onScanning {

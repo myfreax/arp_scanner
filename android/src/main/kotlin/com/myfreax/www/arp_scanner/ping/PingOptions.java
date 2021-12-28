@@ -21,7 +21,4 @@ public class PingOptions {
         return timeToLive;
     }
 
-    public void setTimeToLive(int timeToLive) {
-        this.timeToLive = Math.max(timeToLive, 1);
-    }
 }

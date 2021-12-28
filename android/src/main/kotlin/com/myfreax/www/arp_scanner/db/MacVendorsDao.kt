@@ -1,7 +1,8 @@
-package com.myfreax.www.arp_scanner
+package com.myfreax.www.arp_scanner.db
 
 import androidx.room.Dao
 import androidx.room.Query
+import com.myfreax.www.arp_scanner.db.MacVendor
 
 @Dao
 interface MacVendorsDao {

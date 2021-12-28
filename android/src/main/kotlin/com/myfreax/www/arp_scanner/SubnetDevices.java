@@ -4,16 +4,13 @@ import android.content.Context;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.room.Room;
-
+import com.myfreax.www.arp_scanner.db.AppDatabase;
 import com.myfreax.www.arp_scanner.ping.PingResult;
 import com.myfreax.www.arp_scanner.subnet.Device;
-
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -30,16 +27,15 @@ public class SubnetDevices {
         return db;
     }
 
-    private int noThreads = 100;
+    private final int noThreads = 100;
 
     private ArrayList<String> addresses;
     private ArrayList<Device> devicesFound;
     private OnSubnetDeviceFound listener;
     private Context appContext;
-    private int timeOutMillis = 2500;
     private boolean cancelled = false;
 
-    private boolean disableProcNetMethod = false;
+    private final boolean disableProcNetMethod = false;
     private HashMap<String, String> ipMacHashMap = null;
 
     // This class is not to be instantiated
@@ -87,14 +83,6 @@ public class SubnetDevices {
     }
 
     /**
-     * @param inetAddress - an ip address in the subnet
-     * @return - this for chaining
-     */
-    public static SubnetDevices fromIPAddress(InetAddress inetAddress) {
-        return fromIPAddress(inetAddress.getHostAddress());
-    }
-
-    /**
      * @param ipAddress - the ipAddress string of any device in the subnet i.e. "192.168.0.1"
      *                  the final part will be ignored
      * @return - this for chaining
@@ -126,65 +114,8 @@ public class SubnetDevices {
         }
 
         return subnetDevice;
-
     }
 
-
-    /**
-     * @param ipAddresses - the ipAddresses of devices to be checked
-     * @return - this for chaining
-     */
-    public static SubnetDevices fromIPList(final List<String> ipAddresses) {
-
-        SubnetDevices subnetDevice = new SubnetDevices();
-
-        subnetDevice.addresses = new ArrayList<>();
-
-        subnetDevice.addresses.addAll(ipAddresses);
-
-        return subnetDevice;
-
-    }
-
-    /**
-     * @param noThreads set the number of threads to work with, note we default to a large number
-     *                  as these requests are network heavy not cpu heavy.
-     * @return - this for chaining
-     * @throws IllegalArgumentException - if invalid number of threads requested
-     */
-    public SubnetDevices setNoThreads(int noThreads) throws IllegalArgumentException {
-        if (noThreads < 1) throw new IllegalArgumentException("Cannot have less than 1 thread");
-        this.noThreads = noThreads;
-        return this;
-    }
-
-    /**
-     * Sets the timeout for each address we try to ping
-     *
-     * @param timeOutMillis - timeout in milliseconds for each ping
-     * @return this object to allow chaining
-     * @throws IllegalArgumentException - if timeout is less than zero
-     */
-    public SubnetDevices setTimeOutMillis(int timeOutMillis) throws IllegalArgumentException {
-        if (timeOutMillis < 0) throw new IllegalArgumentException("Timeout cannot be less than 0");
-        this.timeOutMillis = timeOutMillis;
-        return this;
-    }
-
-    /**
-     * @param disable if set to true we will not attempt to read from /proc/net/arp
-     *                directly. This avoids any Android 10 permissions logs appearing.
-     */
-    public void setDisableProcNetMethod(boolean disable) {
-        this.disableProcNetMethod = disableProcNetMethod;
-    }
-
-    /**
-     * Cancel a running scan
-     */
-    public void cancel() {
-        this.cancelled = true;
-    }
 
     /**
      * Starts the scan to find other devices on the subnet
@@ -200,7 +131,6 @@ public class SubnetDevices {
         devicesFound = new ArrayList<>();
 
         new Thread(() -> {
-
             // Load mac addresses into cache var (to avoid hammering the /proc/net/arp file when
             // lots of devices are found on the network.
             ipMacHashMap = disableProcNetMethod ? ARPInfo.getAllIPandMACAddressesFromIPSleigh() : ARPInfo.getAllIPAndMACAddressesInARPCache();
@@ -225,17 +155,13 @@ public class SubnetDevices {
             // Loop over devices found and add in the MAC addresses if missing.
             // We do this after scanning for all devices as /proc/net/arp may add info
             // because of the scan.
-            ipMacHashMap = disableProcNetMethod ? ARPInfo.getAllIPandMACAddressesFromIPSleigh() : ARPInfo.getAllIPAndMACAddressesInARPCache();
+            ipMacHashMap = ARPInfo.getAllIPAndMACAddressesInARPCache();
             for (Device device : devicesFound) {
                 if (device.mac == null && ipMacHashMap.containsKey(device.ip)) {
                     device.mac = ipMacHashMap.get(device.ip);
-                    device.vendor = getVendor(device.mac);
                 }
             }
-
-
             listener.onFinished(devicesFound);
-
         }).start();
 
         return this;
@@ -259,6 +185,7 @@ public class SubnetDevices {
 
             try {
                 InetAddress ia = InetAddress.getByName(address);
+                int timeOutMillis = 2500;
                 PingResult pingResult = Ping.onAddress(ia).setTimeOutMillis(timeOutMillis).doPing();
                 if (pingResult.isReachable) {
                     Device device = new Device(ia);

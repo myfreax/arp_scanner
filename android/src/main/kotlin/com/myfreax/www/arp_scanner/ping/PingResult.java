@@ -14,26 +14,6 @@ public class PingResult {
         this.ia = ia;
     }
 
-    public boolean isReachable() {
-        return isReachable;
-    }
-
-    public boolean hasError() {
-        return error != null;
-    }
-
-    public float getTimeTaken() {
-        return timeTaken;
-    }
-
-    public String getError() {
-        return error;
-    }
-
-    public InetAddress getAddress() {
-        return ia;
-    }
-
     @Override
     public String toString() {
         return "PingResult{" +

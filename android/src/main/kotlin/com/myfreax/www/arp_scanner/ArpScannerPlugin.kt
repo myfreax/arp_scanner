@@ -81,7 +81,9 @@ class ArpScannerPlugin : FlutterPlugin, MethodCallHandler {
                 override fun onDeviceFound(foundedDevice: Device) {
                     Log.d(
                         TAG,
-                        "hostname:${foundedDevice.hostname} Mac:${foundedDevice.mac} IP:${foundedDevice.ip} time:${foundedDevice.time} vendor:${foundedDevice.vendor}"
+                        "hostname:${foundedDevice.hostname} Mac:${foundedDevice.mac} " +
+                                "IP:${foundedDevice.ip} time:${foundedDevice.time} " +
+                                "vendor:${foundedDevice.vendor}"
                     )
                     uiThreadHandler?.post {
                         scanningEventSink?.success(gson.toJson(foundedDevice))

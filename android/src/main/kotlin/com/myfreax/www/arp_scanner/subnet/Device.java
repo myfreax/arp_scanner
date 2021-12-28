@@ -18,6 +18,7 @@ public class Device {
     public String toString() {
         return "Device{" +
                 "ip='" + ip + '\'' +
+                "vendor='" + vendor + '\'' +
                 ", hostname='" + hostname + '\'' +
                 ", mac='" + mac + '\'' +
                 ", time=" + time +

@@ -1,4 +1,4 @@
-package com.myfreax.www.arp_scanner
+package com.myfreax.www.arp_scanner.db
 
 import androidx.room.Entity
 

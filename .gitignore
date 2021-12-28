@@ -7,4 +7,3 @@
 build/
 pkg
 node_modules/
-android/src/main/assets/mac_devices.db

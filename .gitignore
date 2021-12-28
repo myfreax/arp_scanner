@@ -7,3 +7,4 @@
 build/
 pkg
 node_modules/
+.idea

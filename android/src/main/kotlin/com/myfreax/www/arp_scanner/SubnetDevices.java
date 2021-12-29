@@ -166,6 +166,7 @@ public class SubnetDevices {
             for (Device device : devicesFound) {
                 if (device.mac == null && ipMacHashMap.containsKey(device.ip)) {
                     device.mac = ipMacHashMap.get(device.ip);
+                    device.vendor = getVendor(device.mac);
                 }
             }
             listener.onFinished(devicesFound);

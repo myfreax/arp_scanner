@@ -15,10 +15,11 @@ import java.util.ArrayList
 import com.google.gson.Gson
 import android.os.Looper
 
-const val TAG = "ArpScannerPlugin"
-
 /** ArpScannerPlugin */
 class ArpScannerPlugin : FlutterPlugin, MethodCallHandler {
+    companion object{
+        const val TAG= "ArpScannerPlugin"
+    }
     /// The MethodChannel that will the communication between Flutter and native Android
     ///
     /// This local reference serves to register the plugin with the Flutter Engine and unregister it
